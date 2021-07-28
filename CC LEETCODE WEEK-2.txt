@@ -1,0 +1,256 @@
+1)NEXT FREATER NODE IN LINKED LIST-
+================================================
+class Solution {
+    public int[] nextLargerNodes(ListNode head) {
+        if (head == null) return new int[0];
+        int len = getLength(head);
+        Deque<int[]> stack = new ArrayDeque<>(); // stack store the <value, index> pair
+        int[] res = new int[len];
+        ListNode cur = head;
+        for (int i = 0; i < len; i++) {
+            while (!stack.isEmpty() && stack.peek()[0] < cur.val)  {
+                int[] pair = stack.pop();
+                res[pair[1]] = cur.val;
+            }
+            stack.push(new int[]{cur.val, i});
+            cur = cur.next;
+        }
+        return res;
+    }
+    private int getLength(ListNode head) {
+        int n = 0;
+        while (head != null) {
+            n++;
+            head = head.next;
+        }
+        return n;
+    }
+}
+
+
+2)ODD EVEN LINKED LIST-
+====================================
+public class Solution {
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null) return null;
+        ListNode odd = head, even = head.next, evenHead = even;
+        while (even != null && even.next != null) {
+            odd.next = even.next;
+            odd = odd.next;
+            even.next = odd.next;
+            even = even.next;
+        }
+        odd.next = evenHead;
+        return head;
+    }
+}
+
+
+3)FLATTEN A MULTILEVEL DOUBLY LINKED LIST-
+================================================
+class Solution {
+    public Node flatten(Node head) {
+        Node p = head;
+        while(p != null){
+            if(p.child != null){
+                Node tmp = p.child;
+                while(tmp.next != null)
+                    tmp = tmp.next;
+                tmp.next = p.next;
+                if(p.next != null)
+                    p.next.prev = tmp;
+                p.next = p.child;
+                p.child.prev = p;
+                p.child = null;
+            }
+            p = p.next;
+        }
+        return head;
+    }
+}
+
+
+4)SWAP NODES IN PAIRS-
+==================================================
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        return helper(head);
+    }
+    public ListNode helper(ListNode a){
+        if (a == null || a.next ==null){
+            return a;
+        }
+        ListNode b = a.next;
+        a.next=helper(b.next);
+        b.next = a;
+        return b;
+    }
+}
+
+
+5)SORT LIST-
+========================
+
+class Solution {
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+        ListNode mid = getMid(head);
+        ListNode left = sortList(head);
+        ListNode right = sortList(mid);
+        return merge(left, right);
+    }
+
+    ListNode merge(ListNode list1, ListNode list2) {
+        ListNode dummyHead = new ListNode();
+        ListNode tail = dummyHead;
+        while (list1 != null && list2 != null) {
+            if (list1.val < list2.val) {
+                tail.next = list1;
+                list1 = list1.next;
+                tail = tail.next;
+            } else {
+                tail.next = list2;
+                list2 = list2.next;
+                tail = tail.next;
+            }
+        }
+        tail.next = (list1 != null) ? list1 : list2;
+        return dummyHead.next;
+    }
+
+    ListNode getMid(ListNode head) {
+        ListNode midPrev = null;
+        while (head != null && head.next != null) {
+            midPrev = (midPrev == null) ? head : midPrev.next;
+            head = head.next.next;
+        }
+        ListNode mid = midPrev.next;
+        midPrev.next = null;
+        return mid;
+    }
+}
+
+
+6)PARTITION LIST-
+=====================================
+class Solution {
+    public ListNode partition(ListNode head, int x) {
+        ListNode before_head = new ListNode(0);
+        ListNode before = before_head;
+        ListNode after_head = new ListNode(0);
+        ListNode after = after_head;
+
+        while (head != null) {
+            if (head.val < x) {
+                before.next = head;
+                before = before.next;
+            } else {
+                after.next = head;
+                after = after.next;
+            }
+            head = head.next;
+        }
+        after.next = null;
+        before.next = after_head.next;
+        return before_head.next;
+    }
+}
+
+
+7)LINKED LIST IN BINARY TREE-
+=======================================
+class Solution {
+	public boolean isMatched(ListNode head, TreeNode root) {
+		if(head == null)
+			return true;
+		if(root == null || head.val != root.val)
+			return false;
+
+		return (isMatched(head.next, root.left) || isMatched(head.next, root.right));
+	}
+	public boolean isSubPath(ListNode head, TreeNode root) {
+	   if(head == null) 
+			return true;
+
+		if(root == null) 
+			return false;
+
+		if(isMatched(head, root))
+			return true;
+
+		return (isSubPath(head, root.left) || isSubPath(head, root.right));
+	}  
+}
+
+
+8)REORDER LIST-
+=====================================
+class Solution {
+    public void reorderList(ListNode head) {
+        if(head == null || head.next == null) return;
+        
+        ListNode fast = head, slow = head;
+        while(fast.next != null && fast.next.next != null){
+            fast = fast.next.next;
+            slow = slow.next;
+        }//slow is preMid
+        
+        ListNode preMid = slow;
+        ListNode cur = slow.next;//cur is mid
+        while(cur.next != null){
+            ListNode next = cur.next;
+            cur.next = next.next;
+            next.next = preMid.next;
+            preMid.next = next;
+        }
+        
+        ListNode p1 = head;
+        ListNode p2 = preMid.next;
+        
+        while(p1 != preMid){
+            preMid.next = p2.next;
+            p2.next = p1.next;
+            p1.next = p2;
+            p1 = p2.next;
+            p2 = preMid.next;
+        }
+    }
+}
+
+
+9)REMOVE DUPLICATES FROM SORTED LIST-II
+============================================================
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode helper = new ListNode(0);
+        ListNode tail = helper;
+        while (head != null) {
+            if (head.next == null || head.val != head.next.val) {
+                tail.next = head;
+                tail = tail.next;
+            }
+            while(head.next != null && head.val == head.next.val) head = head.next;
+            head = head.next;
+        }
+        tail.next = null;
+        return helper.next;
+    }
+}
+
+
+10)ADD TWO NUMBERS (PYTHON CODE)-
+==============================================================
+class Solution:
+    def addTwoNumbers(self, l1, l2 ,c = 0):
+        val = l1.val + l2.val + c
+        c = val // 10
+        ret = ListNode(val % 10 ) 
+        
+        if (l1.next != None or l2.next != None or c != 0):
+            if l1.next == None:
+                l1.next = ListNode(0)
+            if l2.next == None:
+                l2.next = ListNode(0)
+            ret.next = self.addTwoNumbers(l1.next,l2.next,c)
+        return ret
