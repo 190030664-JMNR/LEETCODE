@@ -1,0 +1,219 @@
+1)SUBRECTANGLE QUERIES-
+====================================
+class SubrectangleQueries:
+
+    def __init__(self, rectangle):
+        self.M = rectangle
+
+    def updateSubrectangle(self, row1 ,col1 ,row2 ,col2 ,newValue):
+        update = [newValue]*(col2-col1+1)
+        for r in range(row1,row2+1):
+            self.M[r][col1:col2+1] = update
+            
+    def getValue(self, row, col):
+        return self.M[row][col]
+
+2)COUNT NUMBER OF TEAMS-
+======================================
+class Solution(object):
+    def numTeams(self, rating):
+        res = 0
+        for i in range(1, len(rating) - 1):
+            less, greater = [0, 0], [0, 0]
+            for j in range(i):
+                if rating[j] < rating[i]:
+                    less[0] += 1
+                else:
+                    greater[0] += 1
+            
+            for k in range(i+1, len(rating)):
+                if rating[i] < rating[k]:
+                    less[1] += 1
+                else:
+                    greater[1] += 1
+            res += less[0] * less[1] + greater[0] * greater[1]
+        return res
+
+
+3)COUNT SQUARE SUBMATRICES WITH ALL ONES-
+=================================================
+class Solution(object):
+    def countSquares(self, A):
+        for i in xrange(1, len(A)):
+            for j in xrange(1, len(A[0])):
+                A[i][j] *= min(A[i - 1][j], A[i][j - 1], A[i - 1][j - 1]) + 1
+        return sum(map(sum, A))
+
+
+4)REDUCE ARRAY SIZE TO THE HALF-
+===================================================
+class Solution(object):
+    def minSetSize(self, arr):
+        hashmap = collections.defaultdict(int)
+        for num in arr:
+            hashmap[num] += 1
+        values = sorted(hashmap.values(), reverse=True)
+        n = len(arr)
+        res = 0
+        for index, value in enumerate(values):
+            res += value
+            if res >= n / 2:
+                return index + 1
+        return n / 2
+
+
+5)FIND THE MINIMUM NUMBER OF FIBONACCI NUMBERS WHOSE SUM IS K-
+====================================================================
+class Solution(object):
+    def findMinFibonacciNumbers(self, k):
+        arr=[0,1]
+        while arr[-1]<k:
+            arr.append(arr[-1]+arr[-2])
+        ans=0
+        for i in range(len(arr)-1,-1,-1):
+            if arr[i]<=k:
+                k-=arr[i]
+                ans+=1
+            if k==0:
+                return ans
+
+
+6)LONGEST SUBARRAY OF 1'S AFTER DELETING ONE ELEMENT-
+=======================================================================
+class Solution {
+    public int longestSubarray(int[] nums) {
+		//initial position of left pointer
+        int l = 0;
+		//ma length of sequence so far
+        int max = 0;
+		//count of 0s we met so far
+        int count0 = 0;
+		
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
+                ++count0;
+            }
+			//we we met 2 0s - need to move left pointer unless number of 0s is 0 or 1
+            while(count0 > 1) {
+                if (nums[l] == 0)
+                    --count0;
+                ++l;
+            }
+			//update max length of sequence we've found so far
+            max = Math.max(max, i - l + 1);
+        }
+		//max will have length including 0, need to adjust it by 1
+        return max - 1;
+    }
+}
+
+7)RANK TEMAS BY VOTES-
+====================================
+class Solution {
+    public String rankTeams(String[] votes) {
+        
+        // check the number of votes cast, if only one, then return the vote and end.
+        int n = votes.length;
+        String firstVote = votes[0];
+        
+        if(n == 1)
+            return firstVote;
+        
+        // with more than on vote to cast, get the total number of teams to rank
+        int numVotes = firstVote.length();
+        
+        // create a 2d array that states how many votes a given team recived at a given rank across all votes
+        // this will be sorted to find the final correct order. The first index in each array is reserved for 
+        // an int representing a team id which can be used for sorting and will be transformed back to a character
+        // at the end of the method when the final order is being rendered and returned.
+        int[][] voteCount = new int[26][27];
+        
+        // using the first vote, mark all the letters that are actually part of this vote (and all others) with
+        // and id so any letters in the alphabet not in the vote can be ignored when rendering the final order.
+        // Note that letter 'A' will be represented as 1 so any index with a value of 0 is a letter not part 
+        // of this paritical list of teams and can be ignored.
+        for(char c : firstVote.toCharArray()){
+            int index = c - 'A';
+            voteCount[index][0] = index + 1;
+        }
+        
+        // for each vote, collect the total number of votes for each team at each position, this will provide
+        // the basis for ranking the teams as the team with the most votes in the first positions will be ranked 
+        // in front of a team with less votes in the first positions.
+        for(String vote : votes){
+            
+            // represent the possible vote positions with 1 - 26 in the voteCount 2d array.
+            for(int i = 1; i <= numVotes; i++){
+                
+                int index = vote.charAt(i - 1) - 'A';
+                voteCount[index][i] ++;
+            }
+        }
+        
+        // with all the votes for each position tallied, use a lambda functiuon to sort the 2d vote count array
+        // first compare two arrays by which of the two has a larger vote total in the indices 1 - 26. If the two
+        // happen to be tied on every vote position, then compare the actual team letter order via their id 
+        // at index 0.
+        Arrays.sort(voteCount, (a,b) -> {
+            for(int i = 1; i < 27; i++){
+                if(a[i] != b[i])
+                   return b[i] - a[i];
+            }
+            
+            return a[0] - b[0];
+        });
+        
+        // with the array of votes per team per position sorted, we can build the final correct team ranking.
+        // use a string builder to efficently construct the final string. Recall that the team id corresponds to
+        // its letter's difference from the letter 'A' + 1, so we subtract 1 from the team id to get the correct 
+        // letter.
+        StringBuilder sb = new StringBuilder();
+        
+        for(int i = 0; i < 26; i++){
+            
+            if(voteCount[i][0] > 0)
+                
+                
+                sb.append((char)('A' + (voteCount[i][0] - 1)));  
+        }
+        
+        return sb.toString();
+    }
+}
+
+
+8)TASK SCHEDULER-
+=====================================
+class Solution {
+    public int leastInterval(char[] tasks, int n) {
+        int len=tasks.length;
+        int[] arr=new int[26];
+        
+        for(int i=0;i<len;i++)
+        {
+            arr[tasks[i]-'A']++;
+        }
+        
+        int max=arr[0];
+        int count=0;
+        
+        for(int i=0;i<26;i++)
+        {
+            if(max<arr[i])
+            {
+                max=arr[i];
+            }
+        }
+        
+        for(int i=0;i<26;i++)
+        {
+            if(max==arr[i])
+            {
+                count++;
+            }
+        }
+        
+        return Math.max(len, (max-1)*(n+1)+count);
+        
+    }
+}
