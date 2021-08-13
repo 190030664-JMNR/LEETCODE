@@ -1,0 +1,528 @@
+
+                                               WEEK 3
+
+1)1381. Design a Stack With Increment Operation
+2)921. Minimum Add to Make Parentheses Valid
+3)1130. Minimum Cost Tree From Leaf Values
+4)739. Daily Temperatures.
+5)1249. Minimum Remove to Make Valid Parentheses
+6)199. Binary Tree Right Side View
+7)1673. Find the Most Competitive Subsequence.
+8)363. Max Sum of Rectangle No Larger Than K
+9)862. Shortest Subarray with Sum at Least K
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+1)1381. Design a Stack With Increment Operation
+
+CODE:-
+
+JAVA:-
+class CustomStack {
+    ArrayList<Integer> stack = new ArrayList();
+    int max=0;
+    public CustomStack(int maxSize) {
+        max = maxSize;
+    }
+    
+    public void push(int x) {
+        if(stack.size() < max){
+            stack.add(x);
+        }
+    }
+    
+    public int pop() {
+        return stack.size() == 0 ? -1 : stack.remove(stack.size()-1);
+    }
+    
+    public void increment(int k, int val) {
+        for(int i = 0;i < stack.size() && i < k;i++){
+            stack.set(i,stack.get(i)+val);
+        }
+    }
+}
+
+
+PYTHON 3:-
+class CustomStack:
+    def __init__(self, maxSize: int):
+        self.increament_at = collections.defaultdict(lambda: 0)
+        self.stack = []
+        self.max_size = maxSize
+
+    def push(self, x: int) -> None:
+        if len(self.stack) < self.max_size:
+            self.stack.append(x)
+
+    def pop(self) -> int:
+        if not self.stack:
+            return -1
+    
+        tmp = self.increament_at[len(self.stack) - 1]
+        self.increament_at[len(self.stack) - 2] += tmp
+        self.increament_at[len(self.stack) - 1] = 0
+        return self.stack.pop() + tmp
+
+    def increment(self, k: int, val: int) -> None:
+        if len(self.stack) < k:
+            self.increament_at[len(self.stack) - 1] += val
+        else:
+            self.increament_at[k-1] += val
+
+---------------------------------------------------------------------------------------------------
+2)921. Minimum Add to Make Parentheses Valid
+
+CODE:-
+
+
+JAVA:-
+class Solution {
+    public int minAddToMakeValid(String s) {
+        int open = 0;
+        int tot = 0;
+        
+        for(char ch:s.toCharArray()) {
+            if(ch == '(') {
+                open++;
+                tot++;
+            }else if(open>0 && ch == ')') {
+                open--;
+                tot--;
+            }else{
+                tot++;
+            }
+        }
+        
+        return tot;
+    }
+}
+
+
+PYTHON 3:-
+class Solution:
+    def minAddToMakeValid(self, s: str) -> int:
+        stk=[]
+        for ch in s:
+            if ch=='(':
+                stk.append(ch)
+            else:
+                if stk:
+                    if stk[-1]=='(':
+                        stk.pop()
+                    else:
+                        stk.append(ch)
+                else:
+                    stk.append(ch)
+        return len(stk)
+
+---------------------------------------------------------------------------------------------------
+
+3)1130. Minimum Cost Tree From Leaf Values
+
+CODE:-
+
+JAVA:-
+class Solution {
+    public int mctFromLeafValues(int[] arr)
+    {
+        int n=arr.length-1;
+        return fun(arr, 0, n, new Pair[n+1][n+1]).sum;
+    }
+    
+    public Pair fun(int[] arr, int l, int r, Pair[][] dp)
+    {
+        if(l>r) return new Pair(0,1000000);
+        if(l==r)return new Pair(arr[l], 0);
+        if(dp[l][r]!=null) return dp[l][r];
+        Pair ans=new Pair(0, 1000000);
+        for(int i=l;i<r;i++)
+        {
+           Pair Pair_left= fun(arr, l, i, dp);
+           Pair  Pair_right=fun(arr, i+1, r, dp);
+            
+            int total= Pair_left.sum + Pair_right.sum +(Pair_left.max * Pair_right.max);
+            
+            if(total< ans.sum)
+            {
+                ans.max= Math.max(Pair_left.max, Pair_right.max);
+                ans.sum= total;
+            }
+        }
+        dp[l][r]= new Pair(ans.max, ans.sum);
+        return ans;
+    }
+}
+
+class Pair
+{
+    int max, sum;
+    Pair(int max, int sum)
+    {
+        this.max=max;
+        this.sum=sum;
+    }
+}
+
+PYTHON 3:-
+class Solution(object):
+    def mctFromLeafValues(self, arr):
+        """
+        :type arr: List[int]
+        :rtype: int
+        """
+        ans = 0
+        while(len(arr)>1):
+            mx = arr[0]*arr[1]
+            l = 0
+            r = 1
+            for i in range(len(arr)-1):
+                if arr[i]*arr[i+1]<mx:
+                    mx = arr[i]*arr[i+1]
+                    l = i
+                    r = i+1
+            ans+=mx
+            #print(l,r,mx)
+            if arr[l]>arr[r]:
+                del arr[r]
+            else:
+                del arr[l]
+        return ans
+
+---------------------------------------------------------------------------------------------------
+
+4)739. Daily Temperatures.
+
+CODE:-
+
+JAVA:-
+class Solution {
+    public int[] dailyTemperatures(int[] temp) {
+	
+        int count[]=new int[temp.length];
+            int c=0;
+
+        for(int i=0;i<temp.length-1;i++)
+        {
+            boolean flag=false;
+            int num=1;
+            for(int j=i+1;j<temp.length;j++)
+            {
+                if(temp[j]>temp[i])//if we encounter a higher temperature
+                {
+                    count[c++]=num;
+                    flag=true;
+                    break;
+                }
+                else
+                    num++;
+                
+            }
+            if(flag==false)//if there is no higher temperature at all
+                count[c++]=0;
+            
+        }
+        count[temp.length-1]=0;//last element always takes 0
+        return count;
+        
+    }
+}
+
+PYTHON 3:-
+class Solution:
+    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        '''
+          0. 1  2  3  4. 5. 6  7
+        [73,74,75,71,69,72,76,73]
+          1  1  4  2. 1  1. 0  0
+         
+         last element will always to 0. 
+         
+         in the stack load only the indices 
+         
+        '''
+        
+        out = [0]*len(temperatures)
+        
+        stack = [] # monotonically decreasing. (holds only the indicies)
+        
+        for curr_index, curr_temp in enumerate(temperatures):
+        
+            while stack and temperatures[stack[-1]] < curr_temp:
+                prev_index = stack.pop()
+                out[prev_index] = curr_index - prev_index
+            
+            stack.append(curr_index)
+        
+        return out
+
+---------------------------------------------------------------------------------------------------
+
+5)1249. Minimum Remove to Make Valid Parentheses
+
+CODE:-
+
+JAVA:-
+class Solution {
+    public String minRemoveToMakeValid(String s) {
+        Set<Integer> indices=new HashSet<>();
+        Stack<Pair<Character,Integer>> st=new Stack<>();
+        
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i)=='('){
+                st.push(new Pair('(',i));
+            }else if(s.charAt(i)==')'){
+                if(st.isEmpty() || st.peek().getKey()!='('){
+                    indices.add(i);
+                }
+                if(!st.isEmpty())st.pop();
+            }
+        }
+        
+        while(!st.isEmpty()){
+            indices.add(st.pop().getValue());
+        }
+                
+        StringBuilder sb=new StringBuilder();
+        
+        for(int i=0;i<s.length();i++){
+            if(!indices.contains(i)){
+                sb.append(s.charAt(i));
+            }
+        }
+        
+        return sb.toString();
+        
+        
+    }
+}
+
+
+PYTHON 3:-
+class Solution(object):
+    def minRemoveToMakeValid(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        stack=[]
+        for i in range(len(s)):
+            if s[i]=="(":
+                stack.append([s[i],i])
+            elif s[i]==")":
+                if len(stack) and stack[-1][0]=="(":
+                    stack.pop(-1)
+                else:
+                    stack.append([s[i],i])
+        # for replacement make array because string in python is cosly every time it make net string           
+        ans=[]
+        for ele in s:
+            ans.append(ele)
+        # whateven unvalid braket present in stack find index and replace with blank char 
+        for ele in stack:
+            index=ele[1]
+            ans[index]=""
+        return "".join(ans)
+
+---------------------------------------------------------------------------------------------------
+6)199. Binary Tree Right Side View
+
+CODE:
+
+JAVA:
+class Solution {
+    public List<Integer> rightSideView(TreeNode root) {
+        
+        List<Integer> list = new ArrayList<>();
+        if(root == null)
+            return list;
+        LinkedList<TreeNode> que = new LinkedList<>();
+        que.addLast(root);
+        while(que.size() != 0)
+        {
+            list.add(que.getFirst().val);
+            int size = que.size();
+            while(size-- >0)
+            {
+                TreeNode temp = que.removeFirst();
+                if(temp.right != null)
+                    que.addLast(temp.right);
+                if(temp.left != null)
+                    que.addLast(temp.left);
+            }
+        }
+        return list;
+    }
+}
+
+PYTHON 3:-
+class Solution(object):
+    def rightSideView(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        ordered_vals = {}
+        level = 0
+        self.right_side_view_recurr(root, ordered_vals, level)
+        return ordered_vals.values()
+
+    def right_side_view_recurr(self, root, ordered_vals, level):
+        if not root:
+            return
+        ordered_vals[level] = root.val
+        self.right_side_view_recurr(root.left, ordered_vals, level + 1)
+        self.right_side_view_recurr(root.right, ordered_vals, level + 1)
+
+---------------------------------------------------------------------------------------------------
+7)1673.Find the Most Competitive Subsequence.
+
+CODE:-
+
+JAVA:-
+class Solution {
+    public int[] mostCompetitive(int[] nums, int k) {
+        int needToDelete = nums.length - k;
+        
+        Stack<Integer> st = new Stack<>();
+        int[] result = new int[k];
+        // Actually, we do not need this if statement, because k must > 0
+        if(needToDelete == nums.length) {
+            return result;
+        }
+        
+        for(int i = 0; i < nums.length; i++) {
+            while(!st.isEmpty() && needToDelete > 0 && st.peek() > nums[i]) {
+                st.pop();
+                needToDelete--;
+            }
+            st.push(nums[i]);
+        }
+        // if needToDelete not == 0, all not needed values must stay on top of the stack 
+        while(needToDelete > 0) {
+            st.pop();
+            needToDelete--;
+        }
+        // put the remaing elements which in the stack to the new array
+        for(int i = result.length - 1; i >= 0; i--) {
+            result[i] = st.pop();
+        }
+        return result;
+    }
+}
+
+PYTHON 3:-
+class Solution:
+	def mostCompetitive(self, nums: List[int], k: int) -> List[int]:
+		end = len(nums) - k
+		ans = []
+		for num in nums:
+			while end and ans and num < ans[-1] :
+				ans.pop()
+				end -= 1
+			ans.append(num)
+		
+		return ans[:k]
+
+
+---------------------------------------------------------------------------------------------------
+8)363. Max Sum of Rectangle No Larger Than K
+
+CODE:-
+
+JAVA:-
+
+class Solution {
+    public int maxSumSubmatrix(int[][] matrix, int ki) {
+        int n=matrix.length;
+        int m=matrix[0].length;
+        int[][] dp=new int[n+2][m+2];
+        int ans=Integer.MIN_VALUE;
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                dp[i][j]=dp[i][j-1]+dp[i-1][j]-dp[i-1][j-1]+matrix[i-1][j-1];
+                if(matrix[i-1][j-1]<=ki)ans=Math.max(ans,matrix[i-1][j-1]);
+            }
+        }
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                for(int k=0;k<=n-i;k++){
+                    for(int l=0;l<=m-j;l++){
+                        int a=k+i;
+                        int b=l+j;
+                        int d=dp[a][b]-dp[a-i][b]-dp[a][b-j]+dp[a-i][b-j];
+                        if(d<=ki)ans=Math.max(ans,d);
+                    }
+                }
+            }
+        }
+        return ans;
+    }
+}
+
+PYTHON 3:-
+class Solution:
+    def maxSumSubmatrix(self, matrix: List[List[int]], k: int) -> int:
+        m, n = len(matrix), len(matrix[0]) # dimensions 
+        
+        ans = -inf 
+        rsum = [[0]*(n+1) for _ in range(m)] # row prefix sum 
+        for j in range(n): 
+            for i in range(m): rsum[i][j+1] = matrix[i][j] + rsum[i][j]
+            for jj in range(j+1):
+                prefix = 0 
+                vals = [0]
+                for i in range(m): 
+                    prefix += rsum[i][j+1] - rsum[i][jj]
+                    x = bisect_left(vals, prefix - k)
+                    if x < len(vals): ans = max(ans, prefix - vals[x])
+                    insort(vals, prefix)
+        return ans
+
+---------------------------------------------------------------------------------------------------
+9)862. Shortest Subarray with Sum at Least K
+
+CODE:-
+
+JAVA:-
+class Solution {
+public int shortestSubarray(int[] ar, int k) {
+        int sum=0;
+        int n = ar.length;        
+        int min = Integer.MAX_VALUE;
+        
+        int[] p = new int[n+1];
+        for(int i=0;i<n;i++){
+            p[i+1]=ar[i]+p[i];
+        }
+        // System.out.println(Arrays.toString(p));
+        
+        
+        Deque<Integer> dq = new LinkedList<>();
+        for(int i =0;i<=n;i++){
+            while(dq.size()>0&&p[i]-p[dq.getFirst()]>=k){                
+                int idx = dq.pollFirst();
+                min=Math.min(i-idx,min);
+            }
+            while(dq.size()>0&&p[i]<=p[dq.getLast()]){
+                dq.pollLast();
+            }
+            dq.add(i);           
+            // System.out.println("i="+i+" dq="+dq);
+        }
+        return (min==Integer.MAX_VALUE)? -1 : min;
+    }
+}
+
+PYTHON 3:-
+
+class Solution:
+    def shortestSubarray(self, A: List[int], K: int) -> int:
+    	C, m, a = [0]+list(itertools.accumulate(A)), float('inf'), collections.deque()
+    	for i, c in enumerate(C):
+    		while a and C[a[-1]] >= c: a.pop()
+    		while a and c - C[a[0]] >= K: m = min(m, i - a.popleft())
+    		a.append(i)
+    	return -1 if m == float('inf') else m
+		
+
+---------------------------------------------------------------------------------------------------

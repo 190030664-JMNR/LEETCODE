@@ -1,0 +1,212 @@
+169.Majority element
+
+
+java
+
+
+
+
+class Solution {
+   public int majorityElement(int[] nums) {
+    int result = 0, count = 0;
+ 
+    for(int i = 0; i<nums.length; i++ ) {
+        if(count == 0){
+            result = nums[ i ];
+            count = 1;
+        }else if(result == nums[i]){
+           count++;
+        }else{
+           count--;
+        }
+    }
+ 
+    return result;
+}
+}
+-----------------------------------------------
+53.Maximum subarray
+
+
+java
+
+
+class Solution {
+   public int maxSubArray(int[] nums) {
+    int result = nums[0];
+    int[] sum =  new int[nums.length];
+    sum[0] = nums[0];
+ 
+    for(int i=1; i<nums.length; i++){
+        sum[i] = Math.max(nums[i], sum[i-1] + nums[i]);
+        result = Math.max(result, sum[i]);
+    }
+ 
+    return result;
+}
+}
+-------------------------------------------------
+973.K closest point to origin 
+
+
+java 
+
+
+class Solution {
+    public int[][] kClosest(int[][] points, int K ){
+
+        int[][] res = new int[K][2];
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>
+                ((a, b) -> Integer.compare(a[0]* a[0] + a[1] * a[1], b[0] * b[0] + b[1] * b[1]));
+
+        for(int[] point : points){
+            minHeap.offer(point);
+        }
+
+        for(int i = 0; i < res.length; i++){
+            res[i] = minHeap.poll();
+        }
+
+        return res;
+    }
+}
+---------------------------------------------------
+932.Beautiful array
+
+
+java
+
+
+public int[] beautifulArray(int N) {
+        ArrayList<Integer> res = new ArrayList<>();
+        res.add(1);
+        while (res.size() < N) {
+            ArrayList<Integer> tmp = new ArrayList<>();
+            for (int i : res) if (i * 2 - 1 <= N) tmp.add(i * 2 - 1);
+            for (int i : res) if (i * 2 <= N) tmp.add(i * 2);
+            res = tmp;
+        }
+        return res.stream().mapToInt(i -> i).toArray();
+    }
+-------------------------------------------------------
+215.Kth largest element in an array
+
+
+java
+
+
+class Solution {
+   public int findKthLargest(int[] nums, int k) {
+    PriorityQueue<Integer> q = new PriorityQueue<Integer>(k);
+    for(int i: nums){
+        q.offer(i);
+ 
+        if(q.size()>k){
+            q.poll();
+        }
+    }
+ 
+    return q.peek();
+}
+}
+----------------------------------------------------------
+241.Different ways to add paranthesis
+
+
+
+python 3
+
+
+class Solution:
+    def diffWaysToCompute(self, input: str) -> List[int]:
+        res = []
+        for i in range(len(input)):
+            if input[i] in '+-*':
+                left = self.diffWaysToCompute(input[:i])
+                right = self.diffWaysToCompute(input[i+1:])
+                for l in left:
+                    for r in right:
+                        if input[i]=='+':
+                            res.append(l+r)
+                        elif input[i]=='-':
+                            res.append(l-r)
+                        elif input[i]=='*':
+                            res.append(l*r)
+        if not res:
+            return [int(input)]
+        return res
+--------------------------------------------------
+240.searching a 2d matrix II
+
+
+java
+
+
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+    int m=matrix.length-1;
+    int n=matrix[0].length-1;
+ 
+    int i=m; 
+    int j=0;
+ 
+    while(i>=0 && j<=n){
+        if(target < matrix[i][j]){
+            i--;
+        }else if(target > matrix[i][j]){
+            j++;
+        }else{
+            return true;
+        }
+    }
+ 
+    return false;
+}
+}
+---------------------------------------------------
+312.Burst balloons
+
+
+python 3
+
+
+class Solution:
+    def maxCoins(self, nums: List[int]) -> int:
+        n = len(nums)
+        @lru_cache(None)
+        def helper(i,j,l,r):
+            if j<0 or i>=n or i>j:
+                return 0
+            ans = 0
+            for k in range(i,j+1):
+                temp = l*nums[k]*r+helper(i,k-1,l,nums[k])+helper(k+1,j,nums[k],r)
+                ans = max(ans,temp)
+            return ans
+        return helper(0,n-1,1,1)
+------------------------------------------------------
+903.Valid Permutations for DI Sequence
+
+
+java
+
+
+class Solution {
+    public int numPermsDISequence(String S) {
+        int n = S.length(), mod = (int)1e9 + 7;
+        int[] dp = new int[n + 1], dp2 = new int[n];;
+        for (int j = 0; j <= n; j++) dp[j] = 1;
+        for (int i = 0; i < n; i++) {
+            if (S.charAt(i) == 'I')
+                for (int j = 0, cur = 0; j < n - i; j++)
+                    dp2[j] = cur = (cur + dp[j]) % mod;
+            else
+                for (int j = n - i - 1, cur = 0; j >= 0; j--)
+                    dp2[j] = cur = (cur + dp[j + 1]) % mod;
+            dp = Arrays.copyOf(dp2, n);
+        }
+        return dp[0];
+    }
+}
+---------------------------------------------------------------------
+
+
